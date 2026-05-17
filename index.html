@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Códigos SMS</title>
+  <style>
+    :root{
+      --bg:#090b18;
+      --card:#12162b;
+      --card2:#171c36;
+      --text:#ffffff;
+      --muted:#aeb7d8;
+      --line:rgba(255,255,255,.12);
+      --pink:#ff2d8d;
+      --blue:#18c8ff;
+      --yellow:#ffd21f;
+      --green:#23e28b;
+      --red:#ff4d6d;
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,45,141,.28), transparent 30%),
+        radial-gradient(circle at 90% 10%, rgba(24,200,255,.24), transparent 32%),
+        radial-gradient(circle at 50% 100%, rgba(255,210,31,.12), transparent 35%),
+        var(--bg);
+      padding:22px;
+    }
+
+    .wrap{max-width:1100px;margin:auto}
+    .hero{
+      border:1px solid var(--line);
+      background:linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border-radius:26px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-80px;
+      background:linear-gradient(110deg, transparent, rgba(255,45,141,.18), transparent, rgba(24,200,255,.16), transparent);
+      transform:rotate(-8deg);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    h1{margin:0 0 8px;font-size:clamp(28px,6vw,54px);letter-spacing:-1px;line-height:1}
+    .sub{margin:0;color:var(--muted);font-size:16px;line-height:1.45}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid rgba(35,226,139,.35);
+      color:#bfffe1;
+      background:rgba(35,226,139,.08);
+      padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;margin-top:16px;
+    }
+
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px}
+    @media(max-width:850px){.grid{grid-template-columns:1fr} body{padding:14px}.hero{padding:18px}}
+
+    .card{
+      background:linear-gradient(180deg, rgba(18,22,43,.96), rgba(10,13,29,.96));
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .card h2{margin:0 0 14px;font-size:22px}
+    label{display:block;font-size:13px;color:var(--muted);margin:12px 0 7px;font-weight:700}
+    input, textarea, select{
+      width:100%;border:1px solid rgba(255,255,255,.14);
+      background:#080b19;color:#fff;border-radius:14px;padding:13px 14px;
+      outline:none;font-size:16px;
+    }
+    textarea{min-height:90px;resize:vertical}
+    input:focus, textarea:focus, select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(24,200,255,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:520px){.row{grid-template-columns:1fr}}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+    button, .btn{
+      border:0;border-radius:14px;padding:13px 16px;font-weight:900;font-size:15px;cursor:pointer;
+      color:#fff;background:linear-gradient(135deg,var(--pink),#8d3dff);box-shadow:0 10px 25px rgba(255,45,141,.22);
+      text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    }
+    button.secondary,.btn.secondary{background:rgba(255,255,255,.09);box-shadow:none;border:1px solid var(--line)}
+    button.blue,.btn.blue{background:linear-gradient(135deg,#0878ff,var(--blue));box-shadow:0 10px 25px rgba(24,200,255,.18)}
+    button.green,.btn.green{background:linear-gradient(135deg,#00b96b,var(--green));box-shadow:0 10px 25px rgba(35,226,139,.18);color:#04140d}
+    button.red,.btn.red{background:linear-gradient(135deg,#c2153d,var(--red));box-shadow:0 10px 25px rgba(255,77,109,.18)}
+
+    .clientBox{
+      text-align:center;
+      padding:18px;
+      border-radius:22px;
+      border:1px solid rgba(24,200,255,.25);
+      background:linear-gradient(180deg, rgba(24,200,255,.1), rgba(255,45,141,.08));
+    }
+    .phone{font-size:18px;color:var(--muted);font-weight:800;margin-bottom:8px}
+    .code{
+      font-size:clamp(46px,12vw,82px);
+      font-weight:1000;
+      letter-spacing:3px;
+      margin:8px 0;
+      color:#fff;
+      text-shadow:0 8px 30px rgba(24,200,255,.35);
+      word-break:break-word;
+    }
+    .emptyCode{font-size:24px;color:var(--muted);font-weight:900;margin:22px 0}
+    .meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.07);border-radius:999px;padding:8px 12px;font-size:13px;color:var(--muted);font-weight:800}
+    .pill.green{border-color:rgba(35,226,139,.35);color:#c8ffe8;background:rgba(35,226,139,.08)}
+    .pill.yellow{border-color:rgba(255,210,31,.4);color:#fff1a8;background:rgba(255,210,31,.08)}
+    .list{display:grid;gap:10px;margin-top:12px;max-height:420px;overflow:auto;padding-right:4px}
+    .item{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.05);padding:12px}
+    .itemTop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .itemCode{font-size:26px;font-weight:1000;color:var(--yellow);letter-spacing:1px}
+    .itemSmall{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+    .note{font-size:13px;color:var(--muted);line-height:1.45;margin-top:12px}
+    .warn{border:1px solid rgba(255,210,31,.32);background:rgba(255,210,31,.08);border-radius:16px;padding:12px;color:#fff0a2;font-size:13px;line-height:1.45;margin-top:14px}
+    .hidden{display:none!important}
+    .copyBox{display:flex;gap:8px;margin-top:10px}
+    .copyBox input{font-size:13px;color:#cdd5ff}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .tab{background:rgba(255,255,255,.08);border:1px solid var(--line);box-shadow:none}
+    .tab.active{background:linear-gradient(135deg,var(--pink),#8d3dff)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Panel de Códigos SMS</h1>
+      <p class="sub">Sistema simple para publicar manualmente el último código recibido. El cliente solo ve el enlace público, sin acceso al celular, TextPlus ni cuenta Google.</p>
+      <div class="badge">✅ Modo manual seguro</div>
+      <div class="tabs">
+        <button class="tab active" id="tabCliente" onclick="setMode('cliente')">👤 Vista cliente</button>
+        <button class="tab" id="tabAdmin" onclick="setMode('admin')">🔐 Panel dueño</button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card" id="clienteSection">
+        <h2>👤 Vista del cliente</h2>
+        <div class="clientBox">
+          <div class="phone" id="clientPhone">Número asignado: —</div>
+          <div id="clientCode" class="emptyCode">Aún no hay código publicado</div>
+          <div class="meta">
+            <span class="pill green" id="statusPill">Activo</span>
+            <span class="pill" id="timePill">Sin publicación</span>
+            <span class="pill yellow" id="expirePill">Visible por tiempo limitado</span>
+          </div>
+          <p class="note" id="clientNote">Cuando el código esté disponible aparecerá aquí. Actualización automática cada 5 segundos.</p>
+          <div class="actions" style="justify-content:center">
+            <button class="blue" onclick="loadData()">🔄 Actualizar ahora</button>
+            <button class="secondary" onclick="copyCurrentCode()">📋 Copiar código</button>
+          </div>
+        </div>
+
+        <div class="warn">
+          Uso recomendado: recepción de códigos para servicios propios o autorizados. No usar para bancos, recuperación de cuentas ajenas, fraude, suplantación ni verificaciones sin permiso.
+        </div>
+      </section>
+
+      <section class="card hidden" id="adminSection">
+        <h2>🔐 Panel del dueño</h2>
+
+        <label>Nombre del cliente</label>
+        <input id="customerName" placeholder="Ejemplo: Cliente Juan" />
+
+        <label>Número asignado</label>
+        <input id="phoneNumber" placeholder="Ejemplo: +1 555 123 4567" />
+
+        <div class="row">
+          <div>
+            <label>Código recibido</label>
+            <input id="smsCode" placeholder="Ejemplo: 123456" inputmode="numeric" />
+          </div>
+          <div>
+            <label>Visible durante</label>
+            <select id="ttlMinutes">
+              <option value="10">10 minutos</option>
+              <option value="30" selected>30 minutos</option>
+              <option value="60">1 hora</option>
+              <option value="180">3 horas</option>
+              <option value="1440">24 horas</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Nota opcional para el cliente</label>
+        <textarea id="note" placeholder="Ejemplo: Código recién recibido. Usarlo lo antes posible."></textarea>
+
+        <div class="actions">
+          <button class="green" onclick="publishCode()">✅ Publicar código</button>
+          <button class="red" onclick="clearCode()">🗑️ Borrar código</button>
+          <button class="secondary" onclick="generateClientLink()">🔗 Generar link cliente</button>
+        </div>
+
+        <div class="copyBox">
+          <input id="clientLink" readonly placeholder="Aquí aparecerá el link del cliente" />
+          <button class="secondary" onclick="copyClientLink()">Copiar</button>
+        </div>
+
+        <p class="note"><b>Importante:</b> esta versión guarda los datos en el navegador de este dispositivo usando localStorage. Sirve para pruebas o si el cliente abre el enlace en el mismo dispositivo. Para que funcione entre celulares/PC diferentes, abajo está la opción con GitHub JSON.</p>
+      </section>
+
+      <section class="card">
+        <h2>📜 Historial reciente</h2>
+        <div class="list" id="historyList"></div>
+      </section>
+
+      <section class="card">
+        <h2>🌐 Opción para verlo desde otro dispositivo</h2>
+        <p class="note">Para que el cliente vea el código desde su propio celular, se necesita guardar el dato en internet. La forma gratis más práctica es usar un archivo JSON en GitHub.</p>
+
+        <label>GitHub Owner</label>
+        <input id="ghOwner" placeholder="Ejemplo: CatalogosHN" />
+
+        <label>Repositorio</label>
+        <input id="ghRepo" placeholder="Ejemplo: codigos-sms" />
+
+        <label>Branch</label>
+        <input id="ghBranch" value="main" />
+
+        <label>Archivo JSON</label>
+        <input id="ghPath" value="sms-data.json" />
+
+        <label>Token GitHub fine-grained PAT</label>
+        <input id="ghToken" type="password" placeholder="Pegar token solo en tu panel, nunca al cliente" />
+
+        <div class="actions">
+          <button class="blue" onclick="saveToGitHub()">☁️ Subir código a GitHub</button>
+          <button class="secondary" onclick="loadFromGitHub()">⬇️ Leer desde GitHub</button>
+        </div>
+
+        <p class="note">El token no queda escrito en el HTML. Solo lo escribís vos en tu navegador. No compartás el link de admin con el token guardado.</p>
+        <div class="warn">Si el repositorio es público, el archivo JSON también será visible. No publiques información sensible, solo el código temporal y datos mínimos.</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'sms_panel_data_v1';
+    let currentData = null;
+
+    function defaultData(){
+      return {
+        customerName:'',
+        phoneNumber:'',
+        code:'',
+        note:'',
+        createdAt:null,
+        expiresAt:null,
+        history:[]
+      };
+    }
+
+    function saveLocal(data){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      currentData = data;
+      render(data);
+    }
+
+    function loadLocal(){
+      try{
+        currentData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData();
+      }catch(e){ currentData = defaultData(); }
+      render(currentData);
+      return currentData;
+    }
+
+    function setMode(mode){
+      const admin = document.getElementById('adminSection');
+      const cliente = document.getElementById('clienteSection');
+      document.getElementById('tabAdmin').classList.toggle('active', mode === 'admin');
+      document.getElementById('tabCliente').classList.toggle('active', mode === 'cliente');
+      admin.classList.toggle('hidden', mode !== 'admin');
+      cliente.classList.toggle('hidden', mode !== 'cliente');
+
+      const url = new URL(location.href);
+      url.searchParams.delete('modo');
+      url.searchParams.delete('admin');
+
+      if(mode === 'admin'){
+        // Link privado del dueño. No se lo mandes al cliente.
+        url.hash = 'panel-rauda-9631';
+      }else{
+        // Link público limpio para el cliente.
+        url.hash = '';
+      }
+      history.replaceState(null, '', url.toString());
+    }
+
+    function publishCode(){
+      const data = currentData || loadLocal();
+      const customerName = document.getElementById('customerName').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const code = document.getElementById('smsCode').value.trim();
+      const note = document.getElementById('note').value.trim();
+      const ttl = Number(document.getElementById('ttlMinutes').value || 30);
+
+      if(!code){ alert('Pegá el código primero.'); return; }
+
+      const now = Date.now();
+      const expiresAt = now + ttl * 60 * 1000;
+
+      const item = { code, customerName, phoneNumber, note, createdAt: now, expiresAt };
+      const history = Array.isArray(data.history) ? data.history : [];
+      history.unshift(item);
+
+      saveLocal({ customerName, phoneNumber, code, note, createdAt: now, expiresAt, history: history.slice(0,20) });
+      document.getElementById('smsCode').value = '';
+      alert('Código publicado correctamente.');
+    }
+
+    function clearCode(){
+      if(!confirm('¿Borrar el código visible?')) return;
+      const data = currentData || loadLocal();
+      data.code = '';
+      data.note = '';
+      data.createdAt = null;
+      data.expiresAt = null;
+      saveLocal(data);
+    }
+
+    function render(data){
+      const now = Date.now();
+      const expired = data.expiresAt && now > data.expiresAt;
+      const hasCode = data.code && !expired;
+
+      document.getElementById('clientPhone').textContent = 'Número asignado: ' + (data.phoneNumber || '—');
+
+      const codeBox = document.getElementById('clientCode');
+      if(hasCode){
+        codeBox.className = 'code';
+        codeBox.textContent = data.code;
+      }else{
+        codeBox.className = 'emptyCode';
+        codeBox.textContent = expired ? 'Código expirado' : 'Aún no hay código publicado';
+      }
+
+      document.getElementById('clientNote').textContent = data.note || 'Cuando el código esté disponible aparecerá aquí. Actualización automática cada 5 segundos.';
+      document.getElementById('timePill').textContent = data.createdAt ? 'Publicado: ' + timeAgo(data.createdAt) : 'Sin publicación';
+      document.getElementById('expirePill').textContent = data.expiresAt ? (expired ? 'Expirado' : 'Expira: ' + timeLeft(data.expiresAt)) : 'Visible por tiempo limitado';
+      document.getElementById('statusPill').textContent = hasCode ? 'Código disponible' : 'Esperando código';
+
+      document.getElementById('customerName').value = data.customerName || '';
+      document.getElementById('phoneNumber').value = data.phoneNumber || '';
+      document.getElementById('note').value = data.note || '';
+
+      renderHistory(data.history || []);
+    }
+
+    function renderHistory(history){
+      const box = document.getElementById('historyList');
+      if(!history.length){
+        box.innerHTML = '<div class="item"><div class="itemSmall">No hay historial todavía.</div></div>';
+        return;
+      }
+      box.innerHTML = history.map(item => `
+        <div class="item">
+          <div class="itemTop">
+            <div class="itemCode">${escapeHtml(item.code || '')}</div>
+            <button class="secondary" onclick="copyText('${escapeJs(item.code || '')}')">Copiar</button>
+          </div>
+          <div class="itemSmall">
+            Cliente: ${escapeHtml(item.customerName || '—')}<br>
+            Número: ${escapeHtml(item.phoneNumber || '—')}<br>
+            Publicado: ${item.createdAt ? new Date(item.createdAt).toLocaleString('es-HN') : '—'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function timeAgo(ts){
+      const sec = Math.max(1, Math.floor((Date.now() - ts)/1000));
+      if(sec < 60) return 'hace ' + sec + ' seg';
+      const min = Math.floor(sec/60);
+      if(min < 60) return 'hace ' + min + ' min';
+      const hr = Math.floor(min/60);
+      if(hr < 24) return 'hace ' + hr + ' h';
+      return new Date(ts).toLocaleString('es-HN');
+    }
+
+    function timeLeft(ts){
+      const sec = Math.max(0, Math.floor((ts - Date.now())/1000));
+      const min = Math.floor(sec/60);
+      const rem = sec % 60;
+      if(min < 60) return `${min}m ${rem}s`;
+      const hr = Math.floor(min/60);
+      return `${hr}h ${min%60}m`;
+    }
+
+    function generateClientLink(){
+      const url = new URL(location.href);
+      // Link limpio para el cliente: sin ?modo=cliente, sin ?admin y sin #clave
+      url.searchParams.delete('modo');
+      url.searchParams.delete('admin');
+      url.hash = '';
+      document.getElementById('clientLink').value = url.toString();
+    }
+
+    function copyCurrentCode(){
+      const data = currentData || loadLocal();
+      if(!data.code){ alert('No hay código para copiar.'); return; }
+      copyText(data.code);
+    }
+
+    function copyClientLink(){
+      const input = document.getElementById('clientLink');
+      if(!input.value) generateClientLink();
+      copyText(document.getElementById('clientLink').value);
+    }
+
+    async function copyText(text){
+      try{ await navigator.clipboard.writeText(text); alert('Copiado.'); }
+      catch(e){ prompt('Copiar manualmente:', text); }
+    }
+
+    function loadData(){
+      loadLocal();
+    }
+
+    function getGitHubConfig(){
+      return {
+        owner: document.getElementById('ghOwner').value.trim(),
+        repo: document.getElementById('ghRepo').value.trim(),
+        branch: document.getElementById('ghBranch').value.trim() || 'main',
+        path: document.getElementById('ghPath').value.trim() || 'sms-data.json',
+        token: document.getElementById('ghToken').value.trim()
+      };
+    }
+
+    async function getGithubFile(cfg){
+      const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path).replaceAll('%2F','/')}?ref=${encodeURIComponent(cfg.branch)}`;
+      const res = await fetch(url, { headers: cfg.token ? { Authorization:`Bearer ${cfg.token}`, Accept:'application/vnd.github+json' } : { Accept:'application/vnd.github+json' }});
+      if(res.status === 404) return null;
+      if(!res.ok) throw new Error('GitHub respondió: ' + res.status);
+      return await res.json();
+    }
+
+    async function saveToGitHub(){
+      const cfg = getGitHubConfig();
+      if(!cfg.owner || !cfg.repo || !cfg.token){ alert('Falta owner, repo o token.'); return; }
+
+      const data = currentData || loadLocal();
+      if(!data.code){ alert('Primero publicá un código localmente.'); return; }
+
+      try{
+        const existing = await getGithubFile(cfg);
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+        const url = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path).replaceAll('%2F','/')}`;
+        const body = {
+          message: 'Actualizar código SMS',
+          content,
+          branch: cfg.branch
+        };
+        if(existing && existing.sha) body.sha = existing.sha;
+
+        const res = await fetch(url, {
+          method:'PUT',
+          headers:{ Authorization:`Bearer ${cfg.token}`, Accept:'application/vnd.github+json' },
+          body: JSON.stringify(body)
+        });
+        if(!res.ok){
+          const txt = await res.text();
+          throw new Error(txt);
+        }
+        alert('Código subido a GitHub correctamente.');
+      }catch(e){
+        alert('Error subiendo a GitHub: ' + e.message);
+      }
+    }
+
+    async function loadFromGitHub(){
+      const cfg = getGitHubConfig();
+      if(!cfg.owner || !cfg.repo){ alert('Falta owner o repo.'); return; }
+      try{
+        const existing = await getGithubFile(cfg);
+        if(!existing || !existing.content){ alert('No existe el archivo JSON todavía.'); return; }
+        const json = decodeURIComponent(escape(atob(existing.content.replace(/\n/g,''))));
+        const data = JSON.parse(json);
+        saveLocal(data);
+        alert('Datos leídos desde GitHub.');
+      }catch(e){
+        alert('Error leyendo desde GitHub: ' + e.message);
+      }
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+    function escapeJs(str){
+      return String(str).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,'');
+    }
+
+    loadLocal();
+    const params = new URLSearchParams(location.search);
+    const isAdminLink = location.hash === '#panel-rauda-9631' || params.get('admin') === '9631' || params.get('modo') === 'admin';
+    setMode(isAdminLink ? 'admin' : 'cliente');
+    setInterval(() => {
+      if(currentData) render(currentData);
+    }, 5000);
+  </script>
+</body>
+</html>
