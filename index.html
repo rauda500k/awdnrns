@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel de Códigos SMS RAUDA ig: @rauda_yt</title>
+  <title>Panel de Códigos SMS</title>
   <style>
     :root{
       --bg:#090b18;
@@ -138,7 +138,7 @@
     <section class="hero">
       <h1>Panel de Códigos SMS</h1>
       <p class="sub">Sistema de mensajes / último código recibido. Creador: RAUDA FF / IG: @rauda_yt</p>
-      <div class="badge">✅ Modo manual seguro</div>
+      <div class="badge">✅ Recibidos Automaticamente</div>
       <!-- Sin botones de cambio de modo.
            El cliente entra normal y solo ve su vista.
            El dueño entra con el link privado que termina en #panel-rauda-9631 -->
@@ -146,7 +146,7 @@
 
     <div class="grid" id="mainGrid">
       <section class="card" id="clienteSection">
-        <h2>👤 Mensajes de texto del cliente</h2>
+        <h2>👤 Mensajes de texto de Isaac</h2>
         <div class="clientBox">
           <div class="phone" id="clientPhone">Número asignado: —</div>
           <div id="clientCode" class="emptyCode">Aún no hay código publicado</div>
@@ -220,10 +220,10 @@
         <p class="note">Para que el cliente vea el código desde su propio celular, se necesita guardar el dato en internet. La forma gratis más práctica es usar un archivo JSON en GitHub.</p>
 
         <label>GitHub Owner</label>
-        <input id="ghOwner" placeholder="Ejemplo: CatalogosHN" />
+        <input id="ghOwner" value="rauda500k" placeholder="Ejemplo: CatalogosHN" />
 
         <label>Repositorio</label>
-        <input id="ghRepo" placeholder="Ejemplo: codigos-sms" />
+        <input id="ghRepo" value="awdnrns" placeholder="Ejemplo: codigos-sms" />
 
         <label>Branch</label>
         <input id="ghBranch" value="main" />
@@ -247,6 +247,16 @@
 
   <script>
     const STORAGE_KEY = 'sms_panel_data_v1';
+    
+    // Configuración pública para que el cliente lea el código SIN token.
+    // El token solo se usa en el panel dueño para escribir/subir datos.
+    const PUBLIC_DATA = {
+      owner: 'rauda500k',
+      repo: 'awdnrns',
+      branch: 'main',
+      path: 'sms-data.json'
+    };
+
     let currentData = null;
 
     function defaultData(){
@@ -428,8 +438,23 @@
       catch(e){ prompt('Copiar manualmente:', text); }
     }
 
-    function loadData(){
-      loadLocal();
+    async function loadData(){
+      await loadPublicData();
+    }
+
+    async function loadPublicData(){
+      try{
+        const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(PUBLIC_DATA.owner)}/${encodeURIComponent(PUBLIC_DATA.repo)}/${encodeURIComponent(PUBLIC_DATA.branch)}/${PUBLIC_DATA.path}?v=${Date.now()}`;
+        const res = await fetch(rawUrl, { cache: 'no-store' });
+        if(!res.ok) throw new Error('No hay código publicado todavía');
+        const data = await res.json();
+        currentData = data;
+        render(data);
+      }catch(e){
+        // Si todavía no existe el JSON, no mostramos error al cliente; dejamos la vista en espera.
+        const data = currentData || loadLocal();
+        render(data);
+      }
     }
 
     function getGitHubConfig(){
@@ -509,8 +534,17 @@
     const params = new URLSearchParams(location.search);
     const isAdminLink = location.hash === '#panel-rauda-9631' || params.get('admin') === '9631' || params.get('modo') === 'admin';
     setMode(isAdminLink ? 'admin' : 'cliente');
+
+    if(!isAdminLink){
+      loadPublicData();
+    }
+
     setInterval(() => {
-      if(currentData) render(currentData);
+      if(isAdminLink){
+        if(currentData) render(currentData);
+      }else{
+        loadPublicData();
+      }
     }, 5000);
   </script>
 </body>
