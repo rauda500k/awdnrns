@@ -1,0 +1,26 @@
+{
+  "customerName": "WhatsApp",
+  "phoneNumber": "WhatsApp",
+  "code": "657-455",
+  "note": "Codigo WhatsApp",
+  "createdAt": 1779064579400,
+  "expiresAt": 1779150979400,
+  "history": [
+    {
+      "code": "657-455",
+      "customerName": "WhatsApp",
+      "phoneNumber": "WhatsApp",
+      "note": "Codigo WhatsApp",
+      "createdAt": 1779064579400,
+      "expiresAt": 1779150979400
+    },
+    {
+      "code": "657-455",
+      "customerName": "WhatsApp",
+      "phoneNumber": "WhatsApp",
+      "note": "Codigo WhatsApp",
+      "createdAt": 1779063677193,
+      "expiresAt": 1779150077193
+    }
+  ]
+}
