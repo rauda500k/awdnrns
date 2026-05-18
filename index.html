@@ -64,6 +64,7 @@
     }
 
     .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:18px}
+    .grid.client-only{grid-template-columns:1fr;max-width:720px;margin-left:auto;margin-right:auto}
     @media(max-width:850px){.grid{grid-template-columns:1fr} body{padding:14px}.hero{padding:18px}}
 
     .card{
@@ -138,13 +139,12 @@
       <h1>Panel de Códigos SMS</h1>
       <p class="sub">Sistema simple para publicar manualmente el último código recibido. El cliente solo ve el enlace público, sin acceso al celular, TextPlus ni cuenta Google.</p>
       <div class="badge">✅ Modo manual seguro</div>
-      <div class="tabs">
-        <button class="tab active" id="tabCliente" onclick="setMode('cliente')">👤 Vista cliente</button>
-        <button class="tab" id="tabAdmin" onclick="setMode('admin')">🔐 Panel dueño</button>
-      </div>
+      <!-- Sin botones de cambio de modo.
+           El cliente entra normal y solo ve su vista.
+           El dueño entra con el link privado que termina en #panel-rauda-9631 -->
     </section>
 
-    <div class="grid">
+    <div class="grid" id="mainGrid">
       <section class="card" id="clienteSection">
         <h2>👤 Vista del cliente</h2>
         <div class="clientBox">
@@ -210,12 +210,12 @@
         <p class="note"><b>Importante:</b> esta versión guarda los datos en el navegador de este dispositivo usando localStorage. Sirve para pruebas o si el cliente abre el enlace en el mismo dispositivo. Para que funcione entre celulares/PC diferentes, abajo está la opción con GitHub JSON.</p>
       </section>
 
-      <section class="card">
+      <section class="card hidden" id="historySection">
         <h2>📜 Historial reciente</h2>
         <div class="list" id="historyList"></div>
       </section>
 
-      <section class="card">
+      <section class="card hidden" id="githubSection">
         <h2>🌐 Opción para verlo desde otro dispositivo</h2>
         <p class="note">Para que el cliente vea el código desde su propio celular, se necesita guardar el dato en internet. La forma gratis más práctica es usar un archivo JSON en GitHub.</p>
 
@@ -278,10 +278,15 @@
     function setMode(mode){
       const admin = document.getElementById('adminSection');
       const cliente = document.getElementById('clienteSection');
-      document.getElementById('tabAdmin').classList.toggle('active', mode === 'admin');
-      document.getElementById('tabCliente').classList.toggle('active', mode === 'cliente');
+      const github = document.getElementById('githubSection');
+      const history = document.getElementById('historySection');
+      const mainGrid = document.getElementById('mainGrid');
+
       admin.classList.toggle('hidden', mode !== 'admin');
+      github.classList.toggle('hidden', mode !== 'admin');
+      history.classList.toggle('hidden', mode !== 'admin');
       cliente.classList.toggle('hidden', mode !== 'cliente');
+      mainGrid.classList.toggle('client-only', mode === 'cliente');
 
       const url = new URL(location.href);
       url.searchParams.delete('modo');
